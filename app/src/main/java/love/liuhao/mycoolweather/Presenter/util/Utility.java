@@ -1,4 +1,4 @@
-package love.liuhao.mycoolweather.util;
+package love.liuhao.mycoolweather.Presenter.util;
 
 import android.text.TextUtils;
 import android.util.Log;

@@ -1,9 +1,7 @@
 package love.liuhao.mycoolweather;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,13 +22,17 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 
 import java.io.IOException;
-import java.lang.reflect.Method;
 
+import interfaces.heweather.com.interfacesmodule.bean.Lang;
+import interfaces.heweather.com.interfacesmodule.bean.Unit;
+import interfaces.heweather.com.interfacesmodule.bean.air.now.AirNow;
+import interfaces.heweather.com.interfacesmodule.bean.weather.now.Now;
+import interfaces.heweather.com.interfacesmodule.view.HeWeather;
+import love.liuhao.mycoolweather.db.TopCity;
 import love.liuhao.mycoolweather.gson.Forecast;
 import love.liuhao.mycoolweather.gson.Weather;
-import love.liuhao.mycoolweather.util.HttpUtil;
-import love.liuhao.mycoolweather.util.Utility;
-import love.liuhao.mycoolweather.util.setFullScreen;
+import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
+import love.liuhao.mycoolweather.Presenter.util.Utility;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -66,6 +68,8 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        String location = intent.getStringExtra("location");    //通过键提取数据
 
         setContentView(R.layout.activity_weather);
 
@@ -101,7 +105,22 @@ public class WeatherActivity extends AppCompatActivity {
         }else {
             loadBingPic();
         }
-        if(weatherString!=null){
+        HeWeather.getWeatherNow(this, location, Lang.CHINESE_SIMPLIFIED, Unit.METRIC, new HeWeather.OnResultWeatherNowBeanListener() {
+            @Override
+            public void onError(Throwable throwable) {
+                Toast.makeText(getApplicationContext(), "加载失败联系管理员", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onSuccess(Now now) {
+                showWeatherInfo(now);
+            }
+
+        });
+
+
+
+/*        if(weatherString!=null){
             //有缓存时直接解析天气数据
             Weather weather= Utility.handleWeatherResponse(weatherString);
             showWeatherInfo(weather);
@@ -110,7 +129,7 @@ public class WeatherActivity extends AppCompatActivity {
             String weatherId=getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(weatherId);
-        }
+        }*/
 
     }
 
@@ -122,6 +141,7 @@ public class WeatherActivity extends AppCompatActivity {
         HttpUtil.sendOkHttpRequest(requestBingPic, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.d("背景加载失败",  "onFailure: ");
                 e.printStackTrace();
             }
 
@@ -141,10 +161,7 @@ public class WeatherActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * 根据天气id请求城市天气信息
-     * @param weatherId
-     */
+/*
     private void requestWeather(final  String weatherId) {
         Log.d("weatherId",weatherId);
             String weatherUrl="http://guolin.tech/api/weather?cityid="+weatherId+"&key=bc0418b57b2d4918819d3974ac1285d9";
@@ -177,19 +194,19 @@ public class WeatherActivity extends AppCompatActivity {
               });
             }
         });
-    }
+    }*/
 
-    private void showWeatherInfo(Weather weather) {
-        String cityName=weather.basic.cityName;
-        String updateTime=weather.basic.update.updateTime.split(" ")[1];
-        String degree=weather.now.temperature+"°C";
-        String weatherInfo=weather.now.more.info;
+    private void showWeatherInfo(Now now) {
+        String cityName=now.getBasic().getLocation();
+        String updateTime=now.getUpdate().getLoc();
+        String degree=now.getNow().getTmp()+"°C";
+        String weatherInfo=now.getNow().getCond_txt();
         titleCity.setText(cityName);
         titleUpdateTime.setText(updateTime);
         forecastLayout.removeAllViews();
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
-        for(Forecast forecast:weather.forecastList){
+/*        for(Forecast forecast:weather.forecastList){
             View view= LayoutInflater.from(this).inflate(R.layout.forecast_item,forecastLayout,false);
             TextView dateText=(TextView)view.findViewById(R.id.date_text);
             TextView infoText=(TextView)view.findViewById(R.id.info_text);
@@ -210,7 +227,7 @@ public class WeatherActivity extends AppCompatActivity {
         String sport="运动建议"+weather.suggestion.sport.info;
         comfortText.setText(comfort);
         carWashText.setText(carWash);
-        sprotText.setText(sport);
+        sprotText.setText(sport);*/
         weatherLayout.setVisibility(View.VISIBLE);
     }
 

@@ -1,17 +1,13 @@
 package love.liuhao.mycoolweather;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.View;
-import android.widget.GridView;
+import android.widget.AdapterView;
 import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
@@ -21,18 +17,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import love.liuhao.mycoolweather.View.MyGridView;
-import love.liuhao.mycoolweather.db.County;
 import love.liuhao.mycoolweather.db.TopCity;
-import love.liuhao.mycoolweather.util.HttpUtil;
-import love.liuhao.mycoolweather.util.MyGridAdapter;
+import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
+import love.liuhao.mycoolweather.Presenter.util.MyGridAdapter;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-import static love.liuhao.mycoolweather.ChooseAreaFragment.LEVEL_COUNTY;
-import static love.liuhao.mycoolweather.util.Utility.handleTopCityResponse;
+import static love.liuhao.mycoolweather.Presenter.util.Utility.handleTopCityResponse;
 
-public class ChooseAreaActivity extends AppCompatActivity {
+public class ChooseAreaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     MyGridView gridView;
     LayoutInflater inflater;
     List<TopCity> listInfo;
@@ -45,7 +39,7 @@ public class ChooseAreaActivity extends AppCompatActivity {
         inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         listInfo = new ArrayList<TopCity>();
         queryTopCity();
-
+        gridView.setOnItemClickListener(this);
     }
     /**
      * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询。
@@ -82,5 +76,27 @@ public class ChooseAreaActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    /**
+     * Callback method to be invoked when an item in this AdapterView has
+     * been clicked.
+     * <p>
+     * Implementers can call getItemAtPosition(position) if they need
+     * to access the data associated with the selected item.
+     *
+     * @param parent   The AdapterView where the click happened.
+     * @param view     The view within the AdapterView that was clicked (this
+     *                 will be a view provided by the adapter)
+     * @param position The position of the view in the adapter.
+     * @param id       The row id of the item that was clicked.
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+       TopCity topCity=listInfo.get(position);
+       String location =topCity.getLocation();
+        Intent intent=new Intent(this,WeatherActivity.class);
+        intent.putExtra("location",location);
+        startActivity(intent);
     }
 }

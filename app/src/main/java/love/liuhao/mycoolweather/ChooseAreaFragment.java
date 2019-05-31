@@ -3,8 +3,6 @@ package love.liuhao.mycoolweather;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +12,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,8 +24,8 @@ import java.util.List;
 import love.liuhao.mycoolweather.db.City;
 import love.liuhao.mycoolweather.db.County;
 import love.liuhao.mycoolweather.db.Province;
-import love.liuhao.mycoolweather.util.HttpUtil;
-import love.liuhao.mycoolweather.util.Utility;
+import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
+import love.liuhao.mycoolweather.Presenter.util.Utility;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -258,8 +255,6 @@ public class ChooseAreaFragment extends Fragment {
             progressDialog.setMessage("正在加载...");
             progressDialog.setCanceledOnTouchOutside(false);
         }
-        Log.d("aaaa String.valueOf(currentLevel):", String.valueOf(currentLevel));
-        System.out.println("String.valueOf(currentLevel):"+String.valueOf(currentLevel));
         progressDialog.show();
     }
 
