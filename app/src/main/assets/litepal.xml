@@ -1,9 +1,10 @@
 <litepal>
     <dbname value="cool_weather"/>
-    <version value="1"/>
+    <version value="2"/>
     <list>
         <mapping class="love.liuhao.mycoolweather.db.Province"/>
         <mapping class="love.liuhao.mycoolweather.db.City"/>
         <mapping class="love.liuhao.mycoolweather.db.County"/>
+        <mapping class="love.liuhao.mycoolweather.db.TopCity"/>
     </list>
 </litepal>

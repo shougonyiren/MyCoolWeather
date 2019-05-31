@@ -1,6 +1,7 @@
 package love.liuhao.mycoolweather.util;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -8,9 +9,13 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 import love.liuhao.mycoolweather.db.City;
 import love.liuhao.mycoolweather.db.County;
 import love.liuhao.mycoolweather.db.Province;
+import love.liuhao.mycoolweather.db.TopCity;
+import love.liuhao.mycoolweather.gson.HeWeather6;
 import love.liuhao.mycoolweather.gson.Weather;
 
 /**
@@ -83,6 +88,28 @@ public class Utility {
         return false;
     }
     /**
+     * 解析和处理服务器返回的热门城市数据
+     */
+    public static boolean handleTopCityResponse(String response) {
+        try{
+            JSONObject jsonObject =new JSONObject(response);
+            JSONArray jsonArray=jsonObject.getJSONArray("HeWeather6");
+            String weatherContent=jsonArray.getJSONObject(0).toString();
+            Log.d(weatherContent, "handleTopCityResponse: ");
+            List<TopCity>A=new Gson().fromJson(weatherContent,HeWeather6.class).topCitiyLisy;
+            for (int i = 0; i < A.size(); i++) {
+                TopCity  topCity =new TopCity();
+                topCity.setLocation (A.get(i).getLocation());
+                topCity.setCid(A.get(i).getCid());
+                topCity.save();
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    /**
      * 将返回的JSON数据解析为Weather实体类
      */
     public static Weather handleWeatherResponse(String response){
@@ -96,4 +123,6 @@ public class Utility {
         }
         return null;
     }
+
+
 }

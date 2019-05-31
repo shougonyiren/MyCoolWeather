@@ -3,8 +3,10 @@
     package="love.liuhao.mycoolweather">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--适配刘海屏、水滴屏 Android P -->
-    <meta-data android:name="android.vendor.full_screen" android:value="true"/>
+    <!-- 适配刘海屏、水滴屏 Android P -->
+    <meta-data
+        android:name="android.vendor.full_screen"
+        android:value="true" />
 
     <application
         android:name="org.litepal.LitePalApplication"
@@ -21,7 +23,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".WeatherActivity"></activity>
+        <activity android:name=".WeatherActivity" />
+        <activity
+            android:name=".ChooseAreaActivity"
+            android:label="@string/title_activity_choose_area"
+            android:theme="@style/AppTheme"></activity>
     </application>
 
 </manifest>
