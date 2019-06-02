@@ -6,17 +6,11 @@ import com.google.gson.annotations.SerializedName;
  * Created by hasee on 2019-05-26.
  */
 public class Forecast {
-    public  String date;
-    @SerializedName("tmp")
-    public  Temperature temperature ;
-    @SerializedName("cond")
-    public  More more ;
-    public class  Temperature{
-        public String max;
-        public String min;
-    }
-    public class  More{
-        @SerializedName("txt_d")
-        public String info;
-    }
+    public  String date;//预报日期
+    public String Tmp_max;//最高温度
+    public String Tmp_min;//最低温度
+    public String getCond_txt_d;//白天天气状况
+    public int  Cond_code_d;//白天天气代码
+    public String getCond_txt_n;//晚上天气状况
+    public int  Cond_code_n;//晚上天气代码
 }

@@ -2,19 +2,18 @@ package love.liuhao.mycoolweather.gson;
 
 import com.google.gson.annotations.SerializedName;
 
+import interfaces.heweather.com.interfacesmodule.bean.basic.Update;
+
 /**
  * Created by hasee on 2019-05-26.
  */
 public class Basic {
-    @SerializedName("city")
-    public String cityName;
-    @SerializedName("id")
-    public String weatherId;
+    public String Location;//cityName
 
-    public Update update;
-    public  class Update{
-        @SerializedName("loc")
-        public String updateTime;
-    }
+    public String getAdmin_area;//该地区／城市所属行政区域
+
+    public String   Cnty;//该地区／城市所属国家名称
+
+
 }
 
