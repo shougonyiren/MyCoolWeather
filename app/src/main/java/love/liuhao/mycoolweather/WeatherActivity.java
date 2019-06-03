@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,23 +25,17 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import interfaces.heweather.com.interfacesmodule.bean.Base;
 import interfaces.heweather.com.interfacesmodule.bean.Lang;
 import interfaces.heweather.com.interfacesmodule.bean.Unit;
-import interfaces.heweather.com.interfacesmodule.bean.air.now.AirNow;
 import interfaces.heweather.com.interfacesmodule.bean.basic.Basic;
 import interfaces.heweather.com.interfacesmodule.bean.weather.forecast.ForecastBase;
-import interfaces.heweather.com.interfacesmodule.bean.weather.now.Now;
 import interfaces.heweather.com.interfacesmodule.bean.weather.now.NowBase;
 import interfaces.heweather.com.interfacesmodule.view.HeWeather;
-import love.liuhao.mycoolweather.Presenter.util.HourlyBaseRecylerAdapter;
-import love.liuhao.mycoolweather.db.TopCity;
-import love.liuhao.mycoolweather.gson.Forecast;
-import love.liuhao.mycoolweather.gson.HeWeather6;
-import love.liuhao.mycoolweather.gson.Weather;
+import love.liuhao.mycoolweather.Presenter.ListDataSave;
 import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
-import love.liuhao.mycoolweather.Presenter.util.Utility;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -82,17 +74,26 @@ public class WeatherActivity extends AppCompatActivity {
 
     public SwipeRefreshLayout swipeRefreshLayout;
 
-    private String location;
+    private String thislocation;
+    private  List<String> locations;
+
+    private Toolbar toolbar;
+
+    private TextView SunscreenBrf_text;
+    private TextView SunscreenTxt_text;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Intent intent = getIntent();
-        location = intent.getStringExtra("location");    //通过键提取数据
-        if(location==null){
+        locations=new ArrayList<>();
 
-            }
+        ListDataSave listDataSave=new ListDataSave(this,"data");
+
+        locations= listDataSave.getDataList("location");
+        Log.d(String.valueOf(locations.size()), "onCreate: ");
+        thislocation=locations.get(0);
+
         setContentView(R.layout.activity_weather);
 
         bingPicImg=findViewById(R.id.bing_pic_img);
@@ -108,12 +109,22 @@ public class WeatherActivity extends AppCompatActivity {
         aqiTxtText=findViewById(R.id.apiTxt_text);
         drsgTxtText=findViewById(R.id.drsgTxt_text);
 
+        SunscreenBrf_text=findViewById(R.id.SunscreenBrf_text);
+        SunscreenTxt_text=findViewById(R.id.SunscreenTxt_text);
+
+
+
+        toolbar=(Toolbar)findViewById(R.id.toolbar111);
+
+        toolbar.inflateMenu(R.menu.menu_choose_addarea);
+
+
         swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                requestWeather();
+                requestWeather(thislocation);
             }
         });
 /*      SharedPreferences preference= PreferenceManager.getDefaultSharedPreferences(this);
@@ -131,10 +142,11 @@ public class WeatherActivity extends AppCompatActivity {
 
         }
         loadBingPic();
-        requestWeather();
+
+        requestWeather(thislocation);
 
     }
-    private void requestWeather(){
+    private void requestWeather(String location){
         HeWeather.getWeather(this, location, Lang.CHINESE_SIMPLIFIED, Unit.METRIC, new HeWeather.OnResultWeatherDataListBeansListener() {
             @Override
             public void onError(Throwable throwable) {
@@ -146,7 +158,7 @@ public class WeatherActivity extends AppCompatActivity {
                 showWeatherInfo(weather);
                 Gson gson= new Gson();
                 String a=gson.toJson(weather);
-                //interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather1=gson.fromJson(a,interfaces.heweather.com.interfacesmodule.bean.weather.Weather.class);
+                System.out.println("aaaabbbbb"+a);
                 SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                 editor.putString(weather.getBasic().getCid(),a);
                 editor.apply();
@@ -154,7 +166,7 @@ public class WeatherActivity extends AppCompatActivity {
             }
         });
     }
-/*    private void InitRecyclerView(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
+ /*    private void InitRecyclerView(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
         mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         mAdapter = new HourlyBaseRecylerAdapter(this,weather.getHourly());
 
@@ -225,6 +237,14 @@ public class WeatherActivity extends AppCompatActivity {
         String  aqi1=weather.getLifestyle().get(7).getBrf();
         String  aqi=weather.getLifestyle().get(7).getTxt();
 
+
+        //紫外线强度
+        String  Sunscreen=weather.getLifestyle().get(5).getBrf();
+        String  Sunscreen1=weather.getLifestyle().get(5).getTxt();
+
+        SunscreenBrf_text.setText(Sunscreen);
+        SunscreenTxt_text.setText(Sunscreen1);
+
         aqiBrfText.setText(aqi1);
         aqiTxtText.setText(aqi);
         drsgTxtText.setText(comfort1);
@@ -234,7 +254,7 @@ public class WeatherActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_choose_area, menu);
+        getMenuInflater().inflate(R.menu.menu_choose_addarea, menu);
         return true;
     }
     @Override

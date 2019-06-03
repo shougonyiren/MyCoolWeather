@@ -14,8 +14,12 @@ import org.litepal.crud.DataSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import love.liuhao.mycoolweather.Presenter.ListDataSave;
 import love.liuhao.mycoolweather.View.MyGridView;
 import love.liuhao.mycoolweather.db.TopCity;
 import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
@@ -75,7 +79,6 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
                 }
             }
         });
-
     }
 
     /**
@@ -97,6 +100,14 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
        String location =topCity.getLocation();
         Intent intent=new Intent(this,WeatherActivity.class);
         intent.putExtra("location",location);
+        ListDataSave listDataSave=new ListDataSave(this,"data");
+
+        List <String> staffsList=listDataSave.getDataList("location");
+        Set result = new HashSet(staffsList);
+        result.add(location);
+        List<String> result1 = new ArrayList<>(result);
+
+        listDataSave.setDataList("location",result1);
         startActivity(intent);
     }
 }

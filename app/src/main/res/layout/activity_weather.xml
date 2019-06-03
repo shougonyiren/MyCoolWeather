@@ -1,39 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimary">
+
     <ImageView
         android:id="@+id/bing_pic_img"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"/>
+        android:scaleType="centerCrop" />
+
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/AppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar111"
+            android:layout_width="match_parent"
+            android:layout_height="?android:attr/actionBarSize"
+            android:background="#007b5a5a"
+            app:popupTheme="@style/ToolbarPopupTheme">
+            <!--app:layout_scrollFlags="scroll"-->
+        </android.support.v7.widget.Toolbar>
+    </android.support.design.widget.AppBarLayout>
+
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-<ScrollView
-    android:id="@+id/weather_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:scrollbars="none"
-    android:overScrollMode="never">
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <include layout="@layout/title"/>
-        <include layout="@layout/now"/>
-<!--        <android.support.v7.widget.RecyclerView
-            android:id="@+id/HourlyBase"
-            android:orientation="horizontal"
+        android:layout_height="match_parent"
+        >
+
+        <ScrollView
+            android:id="@+id/weather_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />-->
-        <include layout="@layout/forecast" />
-        <include layout="@layout/aqi"/>
-        <include layout="@layout/suggestion"/>
-    </LinearLayout>
-</ScrollView>
+            android:layout_height="match_parent"
+            android:overScrollMode="never"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+                <include layout="@layout/title" />
+                <include layout="@layout/now" />
+                <!--        <android.support.v7.widget.RecyclerView
+                            android:id="@+id/HourlyBase"
+                            android:orientation="horizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />-->
+                <include layout="@layout/forecast" />
+
+                <include layout="@layout/aqi" />
+
+                <include layout="@layout/suggestion" />
+                <include layout="@layout/ultraviolet_suggestion"/>
+            </LinearLayout>
+        </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
-</FrameLayout>
+</android.support.constraint.ConstraintLayout>
