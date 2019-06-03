@@ -90,7 +90,9 @@ public class WeatherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Intent intent = getIntent();
         location = intent.getStringExtra("location");    //通过键提取数据
+        if(location==null){
 
+            }
         setContentView(R.layout.activity_weather);
 
         bingPicImg=findViewById(R.id.bing_pic_img);
@@ -144,7 +146,7 @@ public class WeatherActivity extends AppCompatActivity {
                 showWeatherInfo(weather);
                 Gson gson= new Gson();
                 String a=gson.toJson(weather);
-                //           interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather1=gson.fromJson(a,interfaces.heweather.com.interfacesmodule.bean.weather.Weather.class);
+                //interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather1=gson.fromJson(a,interfaces.heweather.com.interfacesmodule.bean.weather.Weather.class);
                 SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                 editor.putString(weather.getBasic().getCid(),a);
                 editor.apply();
@@ -168,7 +170,7 @@ public class WeatherActivity extends AppCompatActivity {
      */
     private void loadBingPic() {
         String requestBingPic="http://guolin.tech/api/bing_pic";
-        HttpUtil.sendOkHttpBackGroundRequest(requestBingPic, new Callback() {
+        HttpUtil.sendOkHttpBackGroundRequest(requestBingPic,this, new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("背景加载失败",  "onFailure: ");
