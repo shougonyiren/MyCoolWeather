@@ -26,7 +26,10 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -40,6 +43,7 @@ import interfaces.heweather.com.interfacesmodule.bean.weather.now.NowBase;
 import interfaces.heweather.com.interfacesmodule.view.HeWeather;
 import love.liuhao.mycoolweather.Presenter.ListDataSave;
 import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
+import love.liuhao.mycoolweather.service.AutoUpdateService;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
@@ -142,8 +146,6 @@ public class WeatherActivity extends AppCompatActivity {
                 return false;
             }
         });
-
-
         swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefreshLayout.setColorSchemeResources(R.color.colorPrimary);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -166,7 +168,6 @@ public class WeatherActivity extends AppCompatActivity {
 */
         }
         loadBingPic();
-
       //  requestWeather(thislocation);
     }
     @Override
@@ -210,7 +211,7 @@ public class WeatherActivity extends AppCompatActivity {
                 showWeatherInfo(weather);
                 //Gson gson= new Gson();
                 String a=gson.toJson(weather);
-                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getApplication()).edit();
                 Log.d(weather.getBasic().getCid(), "requestWeather:  onSuccess ");
                 editor.putString(weather.getBasic().getCid(),a);
                 editor.apply();
@@ -266,6 +267,8 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherInfo(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
+
+
         Basic  basic=weather.getBasic();
         NowBase nowBase=weather.getNow();
         String cityName=basic.getLocation();
@@ -310,5 +313,8 @@ public class WeatherActivity extends AppCompatActivity {
         aqiTxtText.setText(aqi);
         drsgTxtText.setText(comfort1);
         weatherLayout.setVisibility(View.VISIBLE);
+        //开启后台更新
+        Intent intent=new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 }

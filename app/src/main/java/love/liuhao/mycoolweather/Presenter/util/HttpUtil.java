@@ -1,6 +1,7 @@
 package love.liuhao.mycoolweather.Presenter.util;
 
 import android.content.Context;
+import android.net.Network;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,6 @@ public class HttpUtil {
                 .maxAge(1, TimeUnit.DAYS)
                 .maxStale(1,TimeUnit.DAYS)
                 .build();
-
         Request request = new Request.Builder().cacheControl(cacheControl) .url(address) .build();
         newClient.newCall(request).enqueue(callback);
     }
