@@ -88,7 +88,7 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
         });
     }
 
-    /**
+    /**传的是城市代码
      * Callback method to be invoked when an item in this AdapterView has
      * been clicked.
      * <p>
@@ -104,7 +104,7 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
        TopCity topCity=listInfo.get(position);
-       String location =topCity.getLocation();
+       String location =topCity.getCid();
         Intent intent=new Intent(this,WeatherActivity.class);
        // intent.putExtra("location",location);
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");

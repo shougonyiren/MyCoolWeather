@@ -28,11 +28,13 @@ import com.google.gson.Gson;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import interfaces.heweather.com.interfacesmodule.bean.Lang;
 import interfaces.heweather.com.interfacesmodule.bean.Unit;
 import interfaces.heweather.com.interfacesmodule.bean.basic.Basic;
+import interfaces.heweather.com.interfacesmodule.bean.weather.Weather;
 import interfaces.heweather.com.interfacesmodule.bean.weather.forecast.ForecastBase;
 import interfaces.heweather.com.interfacesmodule.bean.weather.now.NowBase;
 import interfaces.heweather.com.interfacesmodule.view.HeWeather;
@@ -84,6 +86,7 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView SunscreenBrf_text;
     private TextView SunscreenTxt_text;
 
+    private int hour=1*60*1000;//1小时的毫秒数
 
     @TargetApi(Build.VERSION_CODES.P)
     @RequiresApi(api = Build.VERSION_CODES.P)
@@ -125,7 +128,6 @@ public class WeatherActivity extends AppCompatActivity {
         toolbar.setTitle(" ");
 // Sub Title
         toolbar.setSubtitle(" ");
-
 
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
@@ -169,7 +171,7 @@ public class WeatherActivity extends AppCompatActivity {
     }
     @Override
     protected void onStart() {
-        Log.d("here", "onPostResume: ");
+
         locations=new ArrayList<>();
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
         locations= listDataSave.getDataList("location");
@@ -183,6 +185,20 @@ public class WeatherActivity extends AppCompatActivity {
         super.onStart();
     }
     private void requestWeather(String location){
+
+        SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
+        String WeatherString =sharedPreferences.getString(location,"");
+        Log.d(location, "requestWeather: ");
+        Gson gson= new Gson();
+        if(!WeatherString.isEmpty()){
+            Weather weather=gson.fromJson(WeatherString,Weather.class);
+            if(!NeedtoUpdate(weather.getUpdate().getLoc())){
+                Log.d("", "requestWeather:成功读取已保存信息 ");
+                showWeatherInfo(weather);
+                swipeRefreshLayout.setRefreshing(false);
+                return;
+            }
+        }
         HeWeather.getWeather(this, location, Lang.CHINESE_SIMPLIFIED, Unit.METRIC, new HeWeather.OnResultWeatherDataListBeansListener() {
             @Override
             public void onError(Throwable throwable) {
@@ -192,25 +208,35 @@ public class WeatherActivity extends AppCompatActivity {
             @Override
             public void onSuccess(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
                 showWeatherInfo(weather);
-                Gson gson= new Gson();
+                //Gson gson= new Gson();
                 String a=gson.toJson(weather);
                 SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                Log.d(weather.getBasic().getCid(), "requestWeather:  onSuccess ");
                 editor.putString(weather.getBasic().getCid(),a);
                 editor.apply();
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
- /*    private void InitRecyclerView(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
-        mLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
-        mAdapter = new HourlyBaseRecylerAdapter(this,weather.getHourly());
-
-        recyclerView = (RecyclerView) findViewById(R.id.HourlyBase);
-        // 设置布局管理器
-        recyclerView .setLayoutManager(mLayoutManager);
-        // 设置adapter
-        recyclerView .setAdapter(mAdapter);
-    }*/
+    boolean NeedtoUpdate(String  time){
+        Log.d(time, "NeedtoUpdate: time");
+        //现在每小时更新
+        String [] strings=time.split(" ");
+        Calendar calendar = Calendar.getInstance();
+        String [] stringtime=strings[1].split(":");
+        Integer hour=Integer.valueOf(stringtime[0]);
+        Log.d(stringtime[0], "NeedtoUpdate: stringtime[0]");
+        if(hour==Calendar.HOUR_OF_DAY){
+            return false;
+        }
+/*        String created = calendar.get(Calendar.YEAR) + "年"
+                + (calendar.get(Calendar.MONTH)+1) + "月"//从0计算
+                + calendar.get(Calendar.DAY_OF_MONTH) + "日"
+                + calendar.get(Calendar.HOUR_OF_DAY) + "时"
+                + calendar.get(Calendar.MINUTE) + "分"+calendar.get(Calendar.SECOND)+"s";
+        Log.e("msg", created);*/
+        return true;
+    }
 
     /**
      * 加载每日一图
