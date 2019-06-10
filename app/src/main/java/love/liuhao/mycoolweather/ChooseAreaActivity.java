@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import org.litepal.crud.DataSupport;
@@ -34,23 +35,29 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
     MyGridView gridView;
     LayoutInflater inflater;
     List<TopCity> listInfo;
+    Button back_button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_area);
-
         gridView = findViewById(R.id.TopGridView);
         inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         listInfo = new ArrayList<TopCity>();
         queryTopCity();
         gridView.setOnItemClickListener(this);
+        back_button=findViewById(R.id.weather_back_button);
+        back_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getBaseContext(),WeatherActivity.class);
+                startActivity(intent);
+            }
+        });
     }
     /**
      * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询。
      */
     private void queryTopCity() {
-/*      titleText.setText(selectedCity.getCityName());
-        backButton.setVisibility(View.VISIBLE);*/
         listInfo = DataSupport.findAll(TopCity.class);
         Log.d(String.valueOf(listInfo.size()), "queryTopCity: listInfo.size() ");
         if (listInfo.size() > 0) {
@@ -99,14 +106,17 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
        TopCity topCity=listInfo.get(position);
        String location =topCity.getLocation();
         Intent intent=new Intent(this,WeatherActivity.class);
-        intent.putExtra("location",location);
-        ListDataSave listDataSave=new ListDataSave(this,"data");
-
+       // intent.putExtra("location",location);
+        ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
+/*
         List <String> staffsList=listDataSave.getDataList("location");
-        Set result = new HashSet(staffsList);
-        result.add(location);
-        List<String> result1 = new ArrayList<>(result);
 
+       Set result = new HashSet(staffsList);//当前为一个天气
+
+        result.add(location);
+        List<String> result1 = new ArrayList<>(result);*/
+        List<String> result1 = new ArrayList<>();
+        result1.add(location);
         listDataSave.setDataList("location",result1);
         startActivity(intent);
     }

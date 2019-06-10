@@ -17,6 +17,7 @@
         android:theme="?attr/actionBarTheme">
 
         <Button
+            android:id="@+id/weather_back_button"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"

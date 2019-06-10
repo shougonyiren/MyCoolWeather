@@ -1,11 +1,13 @@
 package love.liuhao.mycoolweather;
 
+import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -83,15 +85,20 @@ public class WeatherActivity extends AppCompatActivity {
     private TextView SunscreenTxt_text;
 
 
+    @TargetApi(Build.VERSION_CODES.P)
+    @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         locations=new ArrayList<>();
-
-        ListDataSave listDataSave=new ListDataSave(this,"data");
-
+        ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
         locations= listDataSave.getDataList("location");
-        Log.d(String.valueOf(locations.size()), "onCreate: ");
+        if(locations.isEmpty()){
+            Intent intent=new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
+        }
         thislocation=locations.get(0);
 
         setContentView(R.layout.activity_weather);
@@ -111,12 +118,28 @@ public class WeatherActivity extends AppCompatActivity {
 
         SunscreenBrf_text=findViewById(R.id.SunscreenBrf_text);
         SunscreenTxt_text=findViewById(R.id.SunscreenTxt_text);
-
-
-
-        toolbar=(Toolbar)findViewById(R.id.toolbar111);
-
+        setSupportActionBar(toolbar);//设置toolbar
+        toolbar = (Toolbar) findViewById(R.id.toolbar11);
         toolbar.inflateMenu(R.menu.menu_choose_addarea);
+// Title
+        toolbar.setTitle(" ");
+// Sub Title
+        toolbar.setSubtitle(" ");
+
+
+        toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                int i=menuItem.getItemId();
+                switch (i){
+                    case R.id.action_settings: {
+                        Intent intent= new Intent(getBaseContext(),ChooseAreaActivity.class);
+                        startActivity(intent);
+                    }
+                }
+                return false;
+            }
+        });
 
 
         swipeRefreshLayout=(SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -127,24 +150,37 @@ public class WeatherActivity extends AppCompatActivity {
                 requestWeather(thislocation);
             }
         });
-/*      SharedPreferences preference= PreferenceManager.getDefaultSharedPreferences(this);
-        String weatherString =preference.getString("weather",null);
-        String bingPic=preference.getString("bing_pic",null);*/
+
         if ((Build.VERSION.SDK_INT >= 28)) {
             // 使用官方api判断
             WindowManager.LayoutParams lp = getWindow().getAttributes();
             lp.layoutInDisplayCutoutMode = 1;
             getWindow().setAttributes(lp);
+/*
             //不显示状态栏
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-
+*/
         }
         loadBingPic();
 
+      //  requestWeather(thislocation);
+    }
+    @Override
+    protected void onStart() {
+        Log.d("here", "onPostResume: ");
+        locations=new ArrayList<>();
+        ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
+        locations= listDataSave.getDataList("location");
+        if(locations.isEmpty()){
+            Intent intent=new Intent(this,WeatherActivity.class);
+            startActivity(intent);
+            finish();
+        }
+        thislocation=locations.get(0);
         requestWeather(thislocation);
-
+        super.onStart();
     }
     private void requestWeather(String location){
         HeWeather.getWeather(this, location, Lang.CHINESE_SIMPLIFIED, Unit.METRIC, new HeWeather.OnResultWeatherDataListBeansListener() {
@@ -158,7 +194,6 @@ public class WeatherActivity extends AppCompatActivity {
                 showWeatherInfo(weather);
                 Gson gson= new Gson();
                 String a=gson.toJson(weather);
-                System.out.println("aaaabbbbb"+a);
                 SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
                 editor.putString(weather.getBasic().getCid(),a);
                 editor.apply();
@@ -249,25 +284,5 @@ public class WeatherActivity extends AppCompatActivity {
         aqiTxtText.setText(aqi);
         drsgTxtText.setText(comfort1);
         weatherLayout.setVisibility(View.VISIBLE);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_choose_addarea, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent intent=new Intent(this,ChooseAreaActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }

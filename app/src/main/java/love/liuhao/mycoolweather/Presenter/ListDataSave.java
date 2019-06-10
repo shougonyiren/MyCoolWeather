@@ -31,7 +31,7 @@ public class ListDataSave {
         String strJson = gson.toJson(datalist);
         editor.clear();
         editor.putString(tag, strJson);
-        editor.commit();
+        editor.apply();
 
     }
 
