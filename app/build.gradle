@@ -1,6 +1,8 @@
-apply plugin: 'com.android.application'
+apply plugin:'com.android.application'
 
 android {
+    aaptOptions.cruncherEnabled = false
+    aaptOptions.useNewCruncher = false
     compileSdkVersion 28
     defaultConfig {
         applicationId "love.liuhao.mycoolweather"
@@ -22,16 +24,33 @@ android {
 
         sourceCompatibility = "8"
     }
+    sourceSets{
+        main{
+            jniLibs.srcDir 'libs'
+            jni.srcDirs = []    //disable automatic ndk-build
+        }
+    }
+}
+repositories {
+    maven { url   'http://repo1.maven.org/maven2' }
+    jcenter { url   "http://jcenter.bintray.com/" }
 }
 dependencies {
+
+    implementation fileTree(dir:  'libs' , include: ['*.jar'])
+/*    androidTestImplementation ('com.android.support.test.espresso: espresso-core: 2.2.2', {
+        exclude group: 'com.android.support',  module: 'support-annotations'
+    })*/
+
     implementation 'com.romandanylyk:pageindicatorview:1.0.3'
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+
+    testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:appcompat-v7:28.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     implementation 'com.android.support:design:28.0.0'
     implementation 'com.android.support:support-v4:28.0.0'
     implementation 'com.android.support:recyclerview-v7:28.0.0'
-    testImplementation 'junit:junit:4.12'
+
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     api 'org.litepal.android:core:1.4.1'

@@ -67,7 +67,6 @@ public class AutoUpdateService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String thislocation;
-
         List<String> locations;
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
         locations= listDataSave.getDataList("location");
