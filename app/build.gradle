@@ -1,8 +1,9 @@
-apply plugin:'com.android.application'
+apply plugin: 'com.android.application'
 
 android {
     aaptOptions.cruncherEnabled = false
     aaptOptions.useNewCruncher = false
+
     compileSdkVersion 28
     defaultConfig {
         applicationId "love.liuhao.mycoolweather"
@@ -24,20 +25,21 @@ android {
 
         sourceCompatibility = "8"
     }
-    sourceSets{
-        main{
+    sourceSets {
+        main {
             jniLibs.srcDir 'libs'
             jni.srcDirs = []    //disable automatic ndk-build
         }
     }
 }
 repositories {
-    maven { url   'http://repo1.maven.org/maven2' }
-    jcenter { url   "http://jcenter.bintray.com/" }
+    maven { url 'http://repo1.maven.org/maven2' }
+    jcenter { url "http://jcenter.bintray.com/" }
 }
 dependencies {
 
-    implementation fileTree(dir:  'libs' , include: ['*.jar'])
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 /*    androidTestImplementation ('com.android.support.test.espresso: espresso-core: 2.2.2', {
         exclude group: 'com.android.support',  module: 'support-annotations'
     })*/

@@ -3,13 +3,19 @@ package love.liuhao.mycoolweather.service;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.app.job.JobScheduler;
+import android.app.job.JobService;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,16 +25,40 @@ import java.util.List;
 
 import interfaces.heweather.com.interfacesmodule.bean.Lang;
 import interfaces.heweather.com.interfacesmodule.bean.Unit;
+import interfaces.heweather.com.interfacesmodule.bean.basic.Basic;
 import interfaces.heweather.com.interfacesmodule.bean.weather.Weather;
 import interfaces.heweather.com.interfacesmodule.view.HeWeather;
+import love.liuhao.mycoolweather.AppWidget41;
 import love.liuhao.mycoolweather.Presenter.ListDataSave;
+import love.liuhao.mycoolweather.Presenter.SetData;
 import love.liuhao.mycoolweather.WeatherActivity;
 
-public class AutoUpdateService extends Service {
+public class AutoUpdateService extends Service implements SetData {
     int anHour=8*60*60*1000;//8小时的毫秒数
     public AutoUpdateService() {
 
     }
+
+    /**
+     * Called by the system when the service is first created.  Do not call this method directly.
+     */
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        final   BroadcastReceiver receiver= new BroadcastReceiver() {
+           @Override
+           public void onReceive(Context context, Intent intent) {
+               String action = intent.getAction();
+               if (action.equals(Intent.ACTION_TIME_TICK)) {
+                   LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(new Intent("test"));
+               }
+           }
+       };
+         IntentFilter filter=new IntentFilter();
+         filter.addAction(Intent.ACTION_TIME_TICK);
+         registerReceiver(receiver,filter);
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
@@ -97,5 +127,15 @@ public class AutoUpdateService extends Service {
                 editor.apply();
             }
         });
+    }
+
+    @Override
+    public void Notification() {
+
+    }
+
+    @Override
+    public boolean setweather(Basic basic) {
+        return false;
     }
 }

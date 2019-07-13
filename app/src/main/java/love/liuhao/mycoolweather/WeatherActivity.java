@@ -1,8 +1,15 @@
 package love.liuhao.mycoolweather;
 
+import android.Manifest;
 import android.annotation.TargetApi;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,7 +20,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -23,13 +29,14 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.baidu.location.BDAbstractLocationListener;
+import com.baidu.location.BDLocation;
+import com.baidu.location.BDLocationListener;
+import com.baidu.location.LocationClient;
+import com.baidu.location.LocationClientOption;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
-
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -64,10 +71,6 @@ public class WeatherActivity extends AppCompatActivity {
 
     private LinearLayout forecastLayout;
 
- /*    private RecyclerView recyclerView;
-
-   private RecyclerView.LayoutManager mLayoutManager;
-    private HourlyBaseRecylerAdapter mAdapter;*/
 
     //空气污染扩散条件指数
     private TextView aqiTxtText;
@@ -92,22 +95,24 @@ public class WeatherActivity extends AppCompatActivity {
 
     private int hour=1*60*1000;//1小时的毫秒数
 
+
+  //  private LocationClient mLocationClient;
+ //   private MyLocationListener myListener = new MyLocationListener();
     @TargetApi(Build.VERSION_CODES.P)
     @RequiresApi(api = Build.VERSION_CODES.P)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         locations=new ArrayList<>();
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
         locations= listDataSave.getDataList("location");
+
         if(locations.isEmpty()){
-            Intent intent=new Intent(this,WeatherActivity.class);
-            startActivity(intent);
-            finish();
+          locations.add("auto_ip");
+          listDataSave.setDataList("location",locations);
         }
         thislocation=locations.get(0);
-
+        Log.d(thislocation, "onCreate:thislocation");
         setContentView(R.layout.activity_weather);
 
         bingPicImg=findViewById(R.id.bing_pic_img);
@@ -167,21 +172,21 @@ public class WeatherActivity extends AppCompatActivity {
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 */
         }
-        loadBingPic();
-      //  requestWeather(thislocation);
+       // bingPicImg.setImageURI(Uri.parse("https://cdn.heweather.com/cond_icon/100.png"));
+       loadBingPic();
     }
     @Override
     protected void onStart() {
-
         locations=new ArrayList<>();
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
         locations= listDataSave.getDataList("location");
         if(locations.isEmpty()){
-            Intent intent=new Intent(this,WeatherActivity.class);
-            startActivity(intent);
-            finish();
+            thislocation=null;
+            Toast.makeText(this,"未选择城市",Toast.LENGTH_LONG).show();
+        }else {
+            thislocation=locations.get(0);
         }
-        thislocation=locations.get(0);
+        Log.d(thislocation, "onStart: thislocation");
         requestWeather(thislocation);
         super.onStart();
     }
@@ -189,7 +194,7 @@ public class WeatherActivity extends AppCompatActivity {
 
         SharedPreferences sharedPreferences=PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this);
         String WeatherString =sharedPreferences.getString(location,"");
-        Log.d(location, "requestWeather: ");
+        Log.d(location, "requestWeather:");
         Gson gson= new Gson();
         if(!WeatherString.isEmpty()){
             Weather weather=gson.fromJson(WeatherString,Weather.class);
@@ -200,49 +205,81 @@ public class WeatherActivity extends AppCompatActivity {
                 return;
             }
         }
-        HeWeather.getWeather(this, location, Lang.CHINESE_SIMPLIFIED, Unit.METRIC, new HeWeather.OnResultWeatherDataListBeansListener() {
-            @Override
-            public void onError(Throwable throwable) {
-                Toast.makeText(getApplication(),"天气加载失败",Toast.LENGTH_SHORT).show();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-            @Override
-            public void onSuccess(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
-                showWeatherInfo(weather);
-                //Gson gson= new Gson();
-                String a=gson.toJson(weather);
-                SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getApplication()).edit();
-                Log.d(weather.getBasic().getCid(), "requestWeather:  onSuccess ");
-                editor.putString(weather.getBasic().getCid(),a);
-                editor.apply();
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
+            HeWeather.getWeather(this,location, Lang.CHINESE_SIMPLIFIED, Unit.METRIC, new HeWeather.OnResultWeatherDataListBeansListener() {
+                @Override
+                public void onError(Throwable throwable) {
+                    Toast.makeText(getApplication(),"天气加载失败",Toast.LENGTH_SHORT).show();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+                @Override
+                public void onSuccess(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
+                    showWeatherInfo(weather);
+                    //Gson gson= new Gson();
+                    String a=gson.toJson(weather);
+                    SharedPreferences.Editor editor=PreferenceManager.getDefaultSharedPreferences(getApplication()).edit();
+                    Log.d(weather.getBasic().getCid(), "requestWeather:  onSuccess ");
+                   // editor.putString("cond_code",weather.getNow().getCond_code());
+                    String c= "icon_"+weather.getNow().getCond_code()+"d";
+                    editor.putInt("resid",getRes(c));
+                    editor.putString(weather.getBasic().getCid(),a);
+                    editor.apply();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            });
     }
+
+    /**
+     * 根据参数查找drawable目录下的文件名
+     * @param name  文件名
+     * @return
+     */
+    public int  getRes(String name) {
+        ApplicationInfo appInfo = getApplicationInfo();
+        int resID = getResources().getIdentifier(name, "drawable", appInfo.packageName);
+        Log.d(String.valueOf(resID), "getRes: ");
+        return  resID;
+    }
+
     boolean NeedtoUpdate(String  time){
-        Log.d(time, "NeedtoUpdate: time");
+//        Log.d(time, "NeedtoUpdate: time");
         //现在每小时更新
         String [] strings=time.split(" ");
         Calendar calendar = Calendar.getInstance();
         String [] stringtime=strings[1].split(":");
         Integer hour=Integer.valueOf(stringtime[0]);
-        Log.d(stringtime[0], "NeedtoUpdate: stringtime[0]");
         if(hour==Calendar.HOUR_OF_DAY){
             return false;
         }
-/*        String created = calendar.get(Calendar.YEAR) + "年"
-                + (calendar.get(Calendar.MONTH)+1) + "月"//从0计算
-                + calendar.get(Calendar.DAY_OF_MONTH) + "日"
-                + calendar.get(Calendar.HOUR_OF_DAY) + "时"
-                + calendar.get(Calendar.MINUTE) + "分"+calendar.get(Calendar.SECOND)+"s";
-        Log.e("msg", created);*/
         return true;
     }
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        switch (requestCode) {
+            case 1:
+                if (grantResults.length > 0) {
+                    for (int result : grantResults) {
+                        if (result != PackageManager.PERMISSION_GRANTED) {
+                            Toast.makeText(this, "必须同意所有权限才能使用本程序",
+                                    Toast.LENGTH_SHORT).show();
+                            finish();
+                            return;
+                        }
+                    }
+                    //requestLocation();
+                } else {
+                    Toast.makeText(this, "发生未知错误", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                break;
+            default:
+        }
+    }
     /**
      * 加载每日一图
      */
     private void loadBingPic() {
+       // bingPicImg.setImageURI();
         String requestBingPic="http://guolin.tech/api/bing_pic";
         HttpUtil.sendOkHttpBackGroundRequest(requestBingPic,this, new Callback() {
             @Override
@@ -259,7 +296,7 @@ public class WeatherActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
+                       Glide.with(WeatherActivity.this).load(bingPic).into(bingPicImg);
                     }
                 });
             }
@@ -267,8 +304,6 @@ public class WeatherActivity extends AppCompatActivity {
     }
 
     private void showWeatherInfo(interfaces.heweather.com.interfacesmodule.bean.weather.Weather weather) {
-
-
         Basic  basic=weather.getBasic();
         NowBase nowBase=weather.getNow();
         String cityName=basic.getLocation();
@@ -280,9 +315,7 @@ public class WeatherActivity extends AppCompatActivity {
         forecastLayout.removeAllViews();
         degreeText.setText(degree);
         weatherInfoText.setText(weatherInfo);
-/*        if(weather.getHourly()!=null){
-            InitRecyclerView(weather);
-        }*/
+
             forecastLayout.removeAllViews();
       for(ForecastBase forecast:weather.getDaily_forecast()){
             View view= LayoutInflater.from(this).inflate(R.layout.forecast_item,forecastLayout,false);

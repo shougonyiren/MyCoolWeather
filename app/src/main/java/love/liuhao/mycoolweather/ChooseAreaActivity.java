@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import java.util.Set;
 
 import love.liuhao.mycoolweather.Presenter.ListDataSave;
 import love.liuhao.mycoolweather.View.MyGridView;
+import love.liuhao.mycoolweather.db.SearchCity;
 import love.liuhao.mycoolweather.db.TopCity;
 import love.liuhao.mycoolweather.Presenter.util.HttpUtil;
 import love.liuhao.mycoolweather.Presenter.util.MyGridAdapter;
@@ -36,16 +38,29 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
     LayoutInflater inflater;
     List<TopCity> listInfo;
     Button back_button;
+    Toolbar toolbarchoose;
+    Button buttonToSearch;
+    MyGridAdapter myGridAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_area);
-        gridView = findViewById(R.id.TopGridView);
+        toolbarchoose=findViewById(R.id.toolbarchoose);
+        gridView = findViewById(R.id.TopGridView1);
+        buttonToSearch=findViewById(R.id.buttonToSearch);
+        buttonToSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getBaseContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
         inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         listInfo = new ArrayList<TopCity>();
-        queryTopCity();
+        myGridAdapter=new MyGridAdapter(this,listInfo);
         gridView.setOnItemClickListener(this);
-        back_button=findViewById(R.id.weather_back_button);
+        gridView.setAdapter(myGridAdapter);
+        back_button=findViewById(R.id.weather_back1_button);
         back_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,6 +68,7 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
                 startActivity(intent);
             }
         });
+        queryTopCity();
     }
     /**
      * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询。
@@ -61,10 +77,11 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
         listInfo = DataSupport.findAll(TopCity.class);
         Log.d(String.valueOf(listInfo.size()), "queryTopCity: listInfo.size() ");
         if (listInfo.size() > 0) {
-            gridView.setAdapter(new MyGridAdapter(this, listInfo));
+            myGridAdapter.setListInfo(listInfo);
         } else {
             queryTopCityFromServer();
         }
+        myGridAdapter.notifyDataSetChanged();
     }
     private void queryTopCityFromServer(){
         String address="https://search.heweather.net/top?group=cn&key=9d18bcaf984c406691491f4d41e6a1cd&number=39";
@@ -103,18 +120,11 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-       TopCity topCity=listInfo.get(position);
-       String location =topCity.getCid();
+        TopCity topCity=listInfo.get(position);
+        String location =topCity.getCid();
         Intent intent=new Intent(this,WeatherActivity.class);
        // intent.putExtra("location",location);
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
-/*
-        List <String> staffsList=listDataSave.getDataList("location");
-
-       Set result = new HashSet(staffsList);//当前为一个天气
-
-        result.add(location);
-        List<String> result1 = new ArrayList<>(result);*/
         List<String> result1 = new ArrayList<>();
         result1.add(location);
         listDataSave.setDataList("location",result1);

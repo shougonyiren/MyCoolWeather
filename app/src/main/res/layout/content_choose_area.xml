@@ -7,5 +7,4 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ChooseAreaActivity"
     tools:showIn="@layout/activity_choose_area">
-<include layout="@layout/fragment_top_city"/>
 </android.support.v4.widget.NestedScrollView>

@@ -10,14 +10,14 @@
     tools:context=".ChooseAreaActivity">
 
     <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/toolbarhoose"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme">
 
         <Button
-            android:id="@+id/weather_back_button"
+            android:id="@+id/weather_back1_button"
             android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -32,20 +32,28 @@
             android:textSize="20sp"
             />
     </android.support.v7.widget.Toolbar>
-
-    <EditText
-        android:id="@+id/editText2"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_marginLeft="20dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="2dp"
-        android:background="@drawable/for_edittext"
-        android:ems="10"
-        android:hint="搜索城市（中文/拼音）"
-        android:inputType="textPersonName" />
+        android:layout_height="35dp">
 
+        <Button
+            android:id="@+id/buttonToSearch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary" />
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="0dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/for_edittext"
+            android:ems="10"
+            android:hint="搜索城市（中文/拼音）"
+            android:inputType="textPersonName" />
+    </FrameLayout>
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -57,7 +65,7 @@
         android:textSize="18sp" />
 
     <love.liuhao.mycoolweather.View.MyGridView
-        android:id="@+id/TopGridView"
+        android:id="@+id/TopGridView1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"

@@ -16,6 +16,10 @@ public class MyGridAdapter extends BaseAdapter {
     LayoutInflater inflater = null;
     List<TopCity> listInfo;
 
+    public void setListInfo(List<TopCity> listInfo) {
+        this.listInfo = listInfo;
+    }
+
     public MyGridAdapter(Context context, List<TopCity> listInfo){
         //inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater = LayoutInflater.from(context);
