@@ -32,19 +32,19 @@ import okhttp3.Response;
 import static love.liuhao.mycoolweather.Presenter.util.Utility.handleTopCityResponse;
 
 public class ChooseAreaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    MyGridView gridView;
-    LayoutInflater inflater;
-    List<TopCity> listInfo;
+    MyGridView mgridView;
+    LayoutInflater minflater;
+    List<TopCity> mlistInfo;
     Button back_button;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_area);
-        gridView = findViewById(R.id.TopGridView);
-        inflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        listInfo = new ArrayList<TopCity>();
+        mgridView = findViewById(R.id.TopGridView);
+        minflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mlistInfo = new ArrayList<TopCity>();
         queryTopCity();
-        gridView.setOnItemClickListener(this);
+        mgridView.setOnItemClickListener(this);
         back_button=findViewById(R.id.weather_back_button);
         back_button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -58,10 +58,10 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
      * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询。
      */
     private void queryTopCity() {
-        listInfo = DataSupport.findAll(TopCity.class);
-        Log.d(String.valueOf(listInfo.size()), "queryTopCity: listInfo.size() ");
-        if (listInfo.size() > 0) {
-            gridView.setAdapter(new MyGridAdapter(this, listInfo));
+        mlistInfo = DataSupport.findAll(TopCity.class);
+        Log.d(String.valueOf(mlistInfo.size()), "queryTopCity: mlistInfo.size() ");
+        if (mlistInfo.size() > 0) {
+            mgridView.setAdapter(new MyGridAdapter(this, mlistInfo));
         } else {
             queryTopCityFromServer();
         }
@@ -103,18 +103,10 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-       TopCity topCity=listInfo.get(position);
+       TopCity topCity=mlistInfo.get(position);
        String location =topCity.getCid();
         Intent intent=new Intent(this,WeatherActivity.class);
-       // intent.putExtra("location",location);
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
-/*
-        List <String> staffsList=listDataSave.getDataList("location");
-
-       Set result = new HashSet(staffsList);//当前为一个天气
-
-        result.add(location);
-        List<String> result1 = new ArrayList<>(result);*/
         List<String> result1 = new ArrayList<>();
         result1.add(location);
         listDataSave.setDataList("location",result1);
