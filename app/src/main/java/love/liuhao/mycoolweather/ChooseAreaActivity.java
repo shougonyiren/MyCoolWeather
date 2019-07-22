@@ -34,9 +34,9 @@ import okhttp3.Response;
 import static love.liuhao.mycoolweather.Presenter.util.Utility.handleTopCityResponse;
 
 public class ChooseAreaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    MyGridView gridView;
-    LayoutInflater inflater;
-    List<TopCity> listInfo;
+    MyGridView mgridView;
+    LayoutInflater minflater;
+    List<TopCity> mlistInfo;
     Button back_button;
     Toolbar toolbarchoose;
     Button buttonToSearch;
@@ -74,10 +74,10 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
      * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询。
      */
     private void queryTopCity() {
-        listInfo = DataSupport.findAll(TopCity.class);
-        Log.d(String.valueOf(listInfo.size()), "queryTopCity: listInfo.size() ");
-        if (listInfo.size() > 0) {
-            myGridAdapter.setListInfo(listInfo);
+        mlistInfo = DataSupport.findAll(TopCity.class);
+        Log.d(String.valueOf(mlistInfo.size()), "queryTopCity: mlistInfo.size() ");
+        if (mlistInfo.size() > 0) {
+            mgridView.setAdapter(new MyGridAdapter(this, mlistInfo));
         } else {
             queryTopCityFromServer();
         }
@@ -120,10 +120,9 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
      */
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        TopCity topCity=listInfo.get(position);
-        String location =topCity.getCid();
+       TopCity topCity=mlistInfo.get(position);
+       String location =topCity.getCid();
         Intent intent=new Intent(this,WeatherActivity.class);
-       // intent.putExtra("location",location);
         ListDataSave listDataSave=new ListDataSave(getApplication(),"data");
         List<String> result1 = new ArrayList<>();
         result1.add(location);
