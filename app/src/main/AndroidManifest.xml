@@ -22,7 +22,7 @@
         android:usesCleartextTraffic="true">
         <receiver
             android:name=".Presenter.util.ReceiverBoot_completed"
-            android:enabled="true"
+            android:enabled="false"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
@@ -54,13 +54,12 @@
 
         <service
             android:name=".service.AutoUpdateService"
-            android:enabled="true"
+            android:enabled="false"
             android:exported="true" />
 
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

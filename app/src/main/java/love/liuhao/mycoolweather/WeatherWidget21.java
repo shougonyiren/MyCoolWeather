@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -29,6 +30,8 @@ import java.util.List;
 
 import interfaces.heweather.com.interfacesmodule.bean.weather.Weather;
 import love.liuhao.mycoolweather.Presenter.ListDataSave;
+import love.liuhao.mycoolweather.Presenter.util.ReceiverBoot_completed;
+import love.liuhao.mycoolweather.service.AutoUpdateService;
 
 /**
  * Implementation of App Widget functionality.
@@ -71,7 +74,15 @@ public class WeatherWidget21 extends AppWidgetProvider {
     }
     @Override
     public void onEnabled(Context context) {
-        // Enter relevant functionality for when the first widget is created
+       /*当存在桌面控件的情况下，才进行后台更新和开机监测
+       * 启动后台更新和开机监测的操作
+       * */
+        Log.d("启动开机监测", "onEnabled: ");
+        ComponentName chatService = new ComponentName(context,ReceiverBoot_completed.class);
+        PackageManager packageManager =context.getPackageManager();
+        packageManager.setComponentEnabledSetting(chatService,PackageManager.COMPONENT_ENABLED_STATE_ENABLED,PackageManager.DONT_KILL_APP);
+        ComponentName chatService2 = new ComponentName(context, AutoUpdateService.class);
+        packageManager.setComponentEnabledSetting(chatService2,PackageManager.COMPONENT_ENABLED_STATE_ENABLED,PackageManager.DONT_KILL_APP);
 
     }
 

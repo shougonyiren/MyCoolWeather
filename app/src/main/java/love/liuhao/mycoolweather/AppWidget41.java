@@ -29,7 +29,7 @@ import love.liuhao.mycoolweather.Presenter.ListDataSave;
 /**
  * Implementation of App Widget functionality.
  */
-public class AppWidget41 extends AppWidgetProvider {
+public class AppWidget41 extends WeatherWidget21 {
     /**
      * Constructor to initialize AppWidgetProvider.
      */
@@ -85,11 +85,8 @@ public class AppWidget41 extends AppWidgetProvider {
         for (int appWidgetId : appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId);
             appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds,appWidgetId);
-
         }
-
     }
-
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -109,7 +106,7 @@ public class AppWidget41 extends AppWidgetProvider {
        // }
     }
 
-    @Override
+/*    @Override
     public void onEnabled(Context context) {
         // Enter relevant functionality for when the first widget is created
     }
@@ -117,7 +114,7 @@ public class AppWidget41 extends AppWidgetProvider {
     @Override
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
-    }
+    }*/
 
 
 }
