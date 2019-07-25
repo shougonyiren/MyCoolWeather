@@ -34,13 +34,17 @@ import okhttp3.Response;
 import static love.liuhao.mycoolweather.Presenter.util.Utility.handleTopCityResponse;
 
 public class ChooseAreaActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
-    MyGridView mgridView;
+   // MyGridView mgridView;
     LayoutInflater minflater;
     List<TopCity> mlistInfo;
     Button back_button;
     Toolbar toolbarchoose;
     Button buttonToSearch;
     MyGridAdapter myGridAdapter;
+    MyGridView gridView;
+    private LayoutInflater inflater;
+    ArrayList<TopCity> listInfo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +81,7 @@ public class ChooseAreaActivity extends AppCompatActivity implements AdapterView
         mlistInfo = DataSupport.findAll(TopCity.class);
         Log.d(String.valueOf(mlistInfo.size()), "queryTopCity: mlistInfo.size() ");
         if (mlistInfo.size() > 0) {
-            mgridView.setAdapter(new MyGridAdapter(this, mlistInfo));
+            myGridAdapter.setListInfo(mlistInfo);
         } else {
             queryTopCityFromServer();
         }
